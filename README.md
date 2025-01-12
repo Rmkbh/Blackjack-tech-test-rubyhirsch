@@ -26,7 +26,7 @@ To run this program, make sure you have the following installed:
 1. Clone this repository to your local machine:
 
     ```
-    git clone https://github.com/your-username/blackjack-game.git
+    git clone https://github.com/rmkbh/Blackjack-tech-test-rubyhirsch.git
     ```
 
 2. Navigate to the project directory:
