@@ -17,6 +17,10 @@ venv:
 	$(PYTHON_INTERPRETER) -m venv venv
 	@echo "Virtual environment created."
 
+## Activate the virtual environment 
+activate:
+	@echo "Run: source venv/bin/activate"
+
 ## Install dependencies (black, coverage, bandit)
 install-deps: venv
 	./venv/bin/$(PIP) install --upgrade pip
@@ -36,27 +40,27 @@ dev-setup: coverage bandit
 
 # Build / Run
 
-## Run the security tests (using bandit from venv)
+## Run the security tests (now with venv activation)
 security-test:
-	./venv/bin/bandit -lll src/*.py test/*.py
+	source ./venv/bin/activate && bandit -lll src/*.py test/*.py
 
-## Run the unit tests using unittest (using python from venv)
+## Run the unit tests using unittest (with venv activation)
 unit-test:
-	PYTHONPATH=${PYTHONPATH} ./venv/bin/$(PYTHON_INTERPRETER) -m unittest discover -s test -p 'test_*.py' -v
+	source ./venv/bin/activate && PYTHONPATH=${PYTHONPATH} python3 -m unittest discover -s test -p 'test_*.py' -v
 
-## Run the coverage check (using coverage from venv)
+## Run the coverage check (with venv activation)
 check-coverage:
-	PYTHONPATH=${PYTHONPATH} ./venv/bin/$(PYTHON_INTERPRETER) -m coverage run -m unittest discover -s test
-	PYTHONPATH=${PYTHONPATH} ./venv/bin/$(PYTHON_INTERPRETER) -m coverage report
+	source ./venv/bin/activate && PYTHONPATH=${PYTHONPATH} coverage run -m unittest discover -s test
+	source ./venv/bin/activate && PYTHONPATH=${PYTHONPATH} coverage report
 
-## Run the Blackjack script (using python from venv)
+## Run the Blackjack script (with venv activation)
 run-blackjack:
-	./venv/bin/$(PYTHON_INTERPRETER) blackjack.py
+	source ./venv/bin/activate && python3 blackjack.py
 
 ## Run all checks (including setup and security checks)
-run-checks: security-test unit-test check-coverage
+run-checks: activate security-test unit-test check-coverage
 
-##Set-up venv and run all checks
+## Set up venv and run all checks
 venv-run-checks: install-deps dev-setup run-checks
 
 .DEFAULT_GOAL := venv-run-checks
