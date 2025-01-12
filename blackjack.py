@@ -30,6 +30,7 @@ def play():
     #Ok now I've got the players saved to players variable, I want to start a game. 
     while True:
         players = []
+        number_of_busts = 0
         for name in player_names:
             players.append(Player(name))
         game = Game(*players)
@@ -37,20 +38,20 @@ def play():
         game.deal_initial_cards()
         num_of_players = game.num_of_players
         print(''' \n \n''')
-        print(f'The dealer\'s upturned card is the {game.dealer.hand[0]}.')
-        print(''' \n \n ''')
+        
 
         for i in range(num_of_players):
             
             input(f'Please pass the device to {game.players[i].name} and enter "ok":')
             print(''' \n \n \n''')
-            print(f'{game.players[i].name} you have been dealt: {game.players[i].hand} scoring {game.players[i].score} points.')
+            print(f'{game.players[i].name} you have been dealt: {game.players[i].hand} scoring {game.players[i].score} points. {number_of_busts} players have bust. The dealer\'s upturned card is the {game.dealer.hand[0]}.')
             
             while True:
                 stick_twist_answer = input('Would you like to stick (s) or twist (t)?').lower()
                 if stick_twist_answer == 't' or stick_twist_answer == 'twist':
                     print(game.players[i].twist(game))
                     if not game.players[i].valid_hand:
+                        number_of_busts +=1
                         input('Enter "ok" to finish your turn:')
                         print('''\n \n \n \n \n \n \n \n \n \n \n \n \n \n''')
                         break
@@ -61,7 +62,7 @@ def play():
                 else:
                     print(game.players[i].stick())
                     input ('Enter "ok" to finish your turn:')
-                    print('''\n \n \n \n \n \n \n \n \n \n \n \n \n 'n''')
+                    print('''\n \n \n \n \n \n \n \n \n \n \n \n \n \n''')
                     break
         print('''\n \n \n \n \n \n \n \n \n \n''')
         print('The dealer will now take their turn...')
