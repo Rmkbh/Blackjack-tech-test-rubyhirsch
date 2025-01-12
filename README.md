@@ -32,7 +32,7 @@ To run this program, make sure you have the following installed:
 2. Navigate to the project directory:
 
     ```
-    cd blackjack-game
+    cd Blackjack-tech-test-rubyhirsch
     ```
 
 ### Executing the Program
