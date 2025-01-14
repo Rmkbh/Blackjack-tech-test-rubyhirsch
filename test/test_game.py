@@ -15,6 +15,19 @@ def game(test_players):
     game = Game(player1, player2, player3)
     return game
 
+# @pytest.fixture
+# def player_pontoon(game):
+#     player1, _, _ = test_players
+#     test_card1 = 'Ace of spades'
+#     test_card2 = 'King of spades'
+#     player1.receive_card(test_card1)
+#     player1.receive_card(test_card2)
+#     return game
+
+    
+    
+
+
 class TestGameInit:
 
     def test_game_cannot_have_less_than_one_player(self):

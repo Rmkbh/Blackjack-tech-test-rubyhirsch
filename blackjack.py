@@ -50,7 +50,7 @@ def play():
             while hand_index<len(player.hands):
                 hand = player.hands[hand_index]
                 print('\n \n')
-                print(f'{player.name} you have been dealt: {hand} scoring {player.score[hand_index]} points. {number_of_busts} players have bust. The dealer\'s upturned card is the {game.dealer.hands[0][0]}.')
+                print(f'{player.name} you have been dealt: {hand} scoring {player.score[hand_index]} points. {number_of_busts} hands have bust. The dealer\'s upturned card is the {game.dealer.hands[0][0]}.')
 
                 while True:
                     while player.can_split(hand_index) == 'Yes':
@@ -88,8 +88,7 @@ def play():
                         break
 
                         
-                if not game.players[i].valid_hand:
-                    break    
+                
                     
             
             input('Please press "Enter" to finish your turn:')
