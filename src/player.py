@@ -1,21 +1,24 @@
 class Participant:
     def __init__(self):
         self.name = 'default'
-        self.hand = []
+        self.hands = [[]]
         self.valid_hand = 1
-        self.score = 0
+        self.score = [0]
     
-    def receive_card(self, card):
-        self.hand.append(card)
-        self.evaluate_score()
+    def receive_card(self, card, hand_index=0):
+        self.hands[hand_index].append(card)
+        self.evaluate_score(hand_index)
            
-    def evaluate_score(self):
-        self.score = 0
+    def evaluate_score(self, hand_index=0):
+        if hand_index > (len(self.score)-1):
+            self.score.insert(hand_index, 0)
+        else:
+            self.score[hand_index] = 0
         self.valid_hand = 1
-        if len(self.hand)>0:
-            self.hand = [card for card in self.hand if card is not None]
-            non_aces = [card for card in self.hand if ('Ace' not in card)]
-            aces = [card for card in self.hand if ('Ace' in card)]
+        if len(self.hands[hand_index])>0:
+            self.hands[hand_index] = [card for card in self.hands[hand_index] if card is not None]
+            non_aces = [card for card in self.hands[hand_index] if ('Ace' not in card)]
+            aces = [card for card in self.hands[hand_index] if ('Ace' in card)]
 
             
 
@@ -24,27 +27,27 @@ class Participant:
                 rank_suit = card.split(" of ")
                 
                 if rank_suit[0] == 'King' or rank_suit[0] == 'Queen' or rank_suit[0] == 'Jack':
-                    self.score +=10
+                    self.score[hand_index] +=10
                 else:
-                    self.score += int(rank_suit[0])
+                    self.score[hand_index] += int(rank_suit[0])
 
             for card in aces:
-                if self.score + 11 > 21:
-                    self.score+=1
+                if self.score[hand_index] + 11 > 21:
+                    self.score[hand_index]+=1
                 else:
-                    self.score+=11
+                    self.score[hand_index]+=11
                 
-            if self.score > 1 and self.score <22:
-                return self.score
+            if self.score[hand_index] > 1 and self.score[hand_index] <22:
+                return self.score[hand_index]
 
-            if self.score > 21:
+            if self.score[hand_index] > 21:
                 self.valid_hand -= 1
-                return self.score
+                return self.score[hand_index]
         else:
-            return self.score
+            return self.score[hand_index]
         
-    def announce_score(self):
-        score = self.score
+    def announce_score(self, hand_index=0):
+        score = self.score[hand_index]
         if score < 22:
             if self.name == 'Dealer':
                 return f"The dealer's hand scores {score} points."
@@ -62,39 +65,69 @@ class Participant:
         elif self.valid_hand == 0:
             return 'Bust'
         else:
-            return 'Error with valid hand checker'
+            raise ValueError("Valid hand checker faulty!")
         
     
-    def twist(self, game):
+    def twist(self, game, hand_index=0):
         
-        if self.score > 21:
+        if self.score[hand_index] > 21:
             return 'Cannot twist on bust hand!'
         if len(game.deck.cards)>0:
             card = game.deal_card()
-            self.receive_card(card)
-            self.evaluate_score()
+            self.receive_card(card, hand_index)
+            self.evaluate_score(hand_index)
             if self.name == 'Dealer':
-                print(f'The dealer twists and receives the {card}. The dealer\'s hand is now {self.hand}.')
+                print(f'The dealer twists and receives the {card}. The dealer\'s hand is now {self.hands[hand_index]}.')
             else:
-                print(f'You twist and receive the {card}. Your hand is now {self.hand}.')
-            return self.announce_score()
+                print(f'You twist and receive the {card}. Your hand is now {self.hands[hand_index]}.')
+            return self.announce_score(hand_index)
         else:
             raise ValueError("The deck has run out of cards!")
     
-    def stick(self):
-        self.evaluate_score()
+    def stick(self, hand_index=0):
+        self.evaluate_score(hand_index)
         if self.name == 'Dealer':
-            return f'The dealer sticks with hand {self.hand} scoring {self.score} points.'
+            return f'The dealer sticks with hand {self.hands[hand_index]} scoring {self.score[hand_index]} points.'
         else:
-            return f'You stick with hand {self.hand} scoring {self.score} points.'
-
+            return f'You stick with hand {self.hands[hand_index]} scoring {self.score[hand_index]} points.'
+    
 
 class Player(Participant):
 
     def __init__(self, name):
         super().__init__()
         self.name = name
+    
+    def can_split(self, hand_index=0):
+        if len(self.hands[hand_index]) ==2:
+            if self.hands[hand_index][0].split(" of ")[0] == self.hands[hand_index][1].split(" of ")[0]:
+                return 'Yes'
+            else:
+                return 'No'
+        else: 
+            return 'No'
         
+        
+    def split(self, game, hand_index=0):
+        if len(self.hands[hand_index])==2:
+            if self.hands[hand_index][0].split(" of ")[0] == self.hands[hand_index][1].split(" of ")[0]:
+                #take the second card from first hand and move it into a second hand.
+                second_card = self.hands[hand_index].pop()
+                self.hands.append([second_card])
+                #deal one new card to each of the split hands
+                card1 = game.deal_card()
+                self.receive_card(card1, hand_index)
+                card2 = game.deal_card()
+                self.receive_card(card2, len(self.hands)-1)
+                return (f'You split and are dealt a {card1} and a {card2}. Your hands are now {self.hands}')
+            else:
+                raise ValueError("Splitting only allowed for two cards of the same rank.")
+        else:   
+            raise ValueError("Splitting only allowed with initial two cards.")
+        
+        
+
+
         
     
 class Dealer(Participant):

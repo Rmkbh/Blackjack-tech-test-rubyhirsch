@@ -22,6 +22,7 @@ def play():
         answer = input(f'Thanks {name}, are there any more players joining the game? Yes (y) or No (n):').lower()
         if answer not in ['y', 'yes', 'n', 'no']:
              print("Invalid input. Please try again.")
+             continue
         if answer == 'y' or answer== 'yes':
             player_count +=1
         else:
@@ -36,37 +37,66 @@ def play():
         game = Game(*players)
         game.shuffle()
         game.deal_initial_cards()
-        num_of_players = game.num_of_players
         print(''' \n \n''')
         
-
-        for i in range(num_of_players):
-            
-            input(f'Please pass the device to {game.players[i].name} and enter "ok":')
+        
+        for i in range(player_count):
+            hand_index = 0
+            player = game.players[i]
+            print('\n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n ')
+            input(f'Please pass the device to {player.name} and press "Enter":')
             print(''' \n \n \n''')
-            print(f'{game.players[i].name} you have been dealt: {game.players[i].hand} scoring {game.players[i].score} points. {number_of_busts} players have bust. The dealer\'s upturned card is the {game.dealer.hand[0]}.')
-            
-            while True:
-                stick_twist_answer = input('Would you like to stick (s) or twist (t)?').lower()
-                if stick_twist_answer == 't' or stick_twist_answer == 'twist':
-                    print(game.players[i].twist(game))
-                    if not game.players[i].valid_hand:
-                        number_of_busts +=1
-                        input('Enter "ok" to finish your turn:')
-                        print('''\n \n \n \n \n \n \n \n \n \n \n \n \n \n''')
-                        break
-                
-                elif stick_twist_answer not in ['s', 't', 'stick', 'twist']:
-                    print('Invalid input. Please try again.')
 
-                else:
-                    print(game.players[i].stick())
-                    input ('Enter "ok" to finish your turn:')
-                    print('''\n \n \n \n \n \n \n \n \n \n \n \n \n \n''')
-                    break
-        print('''\n \n \n \n \n \n \n \n \n \n''')
+            while hand_index<len(player.hands):
+                hand = player.hands[hand_index]
+                print('\n \n')
+                print(f'{player.name} you have been dealt: {hand} scoring {player.score[hand_index]} points. {number_of_busts} players have bust. The dealer\'s upturned card is the {game.dealer.hands[0][0]}.')
+
+                while True:
+                    while player.can_split(hand_index) == 'Yes':
+                        split_answer = input(f'Your hand is {hand} scoring {player.score[hand_index]} points. Would you like to split? Yes (y) or No (n):').lower()
+                        if split_answer in ['yes', 'y', 'split']:
+                            print(''' \n \n ''')
+                            print(player.split(game, hand_index))
+                            print(f'Your hand is: {player.hands[hand_index]} scoring {player.score[hand_index]} points. {number_of_busts} players have bust. The dealer\'s upturned card is the {game.dealer.hands[0][0]}.')
+
+                        else:
+                            break
+
+                    
+                    stick_twist_answer = input('Would you like to stick (s) or twist (t)?').lower()
+                    if stick_twist_answer == 't' or stick_twist_answer == 'twist':
+                        print(''' \n \n ''')
+                        print(game.players[i].twist(game, hand_index))
+                        if not game.players[i].valid_hand:
+                            number_of_busts +=1
+                            hand_index += 1
+                            break
+                        else:
+                            continue
+                            
+                            
+                    
+                    elif stick_twist_answer not in ['s', 't', 'stick', 'twist']:
+                        print('Invalid input. Please try again.')
+                        continue
+
+                    else:
+                        print(''' \n \n ''')
+                        print(game.players[i].stick(hand_index))
+                        hand_index+=1
+                        break
+
+                        
+                if not game.players[i].valid_hand:
+                    break    
+                    
+            
+            input('Please press "Enter" to finish your turn:')
+
+        print('''\n \n \n \n \n \n \n \n \n \n \n \n \n ''')
         print('The dealer will now take their turn...')
-        print(f'The dealer\'s hand is {game.dealer.hand} scoring {game.dealer.score} points.')
+        print(f'The dealer\'s hand is {game.dealer.hands[0]} scoring {game.dealer.score[0]} points.')
         game.dealer.take_turn(game)
         print(''' \n ''')
         print(game.announce_winner())

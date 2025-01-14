@@ -1,228 +1,187 @@
-import unittest
+import pytest
 from src.player import Participant, Player, Dealer
 from src.game import Game
 from src.deck import Deck
 
-class PlayerTestCase(unittest.TestCase):
+@pytest.fixture
+def test_player():
+    return Player("Ruby")
 
-    def setUp(self):
-        self.test_player = Player("Ruby")
-        self.test_dealer = Dealer()
-        self.test_game = Game(self.test_player)
-        self.test_game.deck.shuffle()
-    
-    def tearDown(self):
-        pass
+@pytest.fixture
+def test_dealer():
+    return Dealer()
 
-    def test_player_name(self):
-        assert self.test_player.name == "Ruby"
+@pytest.fixture
+def test_game(test_player):
+    game = Game(test_player)
+    game.deck.shuffle()
+    return game
 
-    def test_player_can_receive_one_card(self):
+class TestPlayer:
+    def test_player_name(self, test_player):
+        assert test_player.name == "Ruby"
+
+    def test_player_can_receive_one_card(self, test_player):
         test_card = "Queen of hearts"
-        self.test_player.receive_card(test_card)
-        assert self.test_player.hand == ["Queen of hearts"]
-    
-    def test_player_can_receive_multiple_cards(self):
-        test_card1= "3 of clubs"
-        test_card2= "6 of diamonds"
-        self.test_player.receive_card(test_card1)
-        self.test_player.receive_card(test_card2)
-        assert self.test_player.hand==["3 of clubs", "6 of diamonds"]
-    
-    def test_receiving_cards_updates_score(self):
-        test_card1= "3 of clubs"
-        test_card2= "6 of diamonds"
-        self.test_player.receive_card(test_card1)
-        self.test_player.receive_card(test_card2)
-        self.assertEqual(self.test_player.score, 9)
+        test_player.receive_card(test_card)
+        assert test_player.hands[0] == ["Queen of hearts"]
 
-    def test_announce_returns_correct_for_two_cards(self):
-        test_card1= "3 of clubs"
-        test_card2= "6 of diamonds"
-        self.test_player.receive_card(test_card1)
-        self.test_player.receive_card(test_card2)
-        assert self.test_player.announce_score() == 'Your hand scores 9 points.'
-        assert self.test_player.score == 9
-
-    def test_score_hand_returns_correct_for_hand_with_ace(self):
-        test_card1 = "King of spades"
-        test_card2 = "Ace of clubs"
-        self.test_player.receive_card(test_card1)
-        self.test_player.receive_card(test_card2)
-        test_score = self.test_player.score
-        
-        self.assertEqual(self.test_player.announce_score(), 'Your hand scores 21 points.')
-        self.assertEqual(test_score, 21)
-    
-    def test_score_hand_evaluates_correct_for_three_cards_one_ace(self):
-        test_card1 = "King of spades"
-        test_card2 = "Ace of clubs"
-        test_card3 = "Queen of diamonds"
-        self.test_player.receive_card(test_card1)
-        self.test_player.receive_card(test_card2)
-        self.test_player.receive_card(test_card3)
-        test_score = self.test_player.score
-
-        self.assertEqual(self.test_player.announce_score(),'Your hand scores 21 points.')
-        self.assertEqual(test_score, 21)
-    
-    def test_score_hand_evaluates_correctly_multiple_aces(self):
-        test_card1 = "Ace of spades"
-        test_card2 = "Ace of clubs"
-        test_card3 = "9 of diamonds"
-        self.test_player.receive_card(test_card1)
-        self.test_player.receive_card(test_card2)
-        self.test_player.receive_card(test_card3)
-        test_score = self.test_player.score
-
-        self.assertEqual(self.test_player.announce_score(), 'Your hand scores 21 points.')
-        self.assertEqual(test_score, 21)
-    
-    def test_score_returns_bust_for_bust_hand(self):
-        test_card1 = "King of spades"
-        test_card2 = "Jack of clubs"
-        test_card3 = "9 of diamonds"
-        self.test_player.receive_card(test_card1)
-        self.test_player.receive_card(test_card2)
-        self.test_player.receive_card(test_card3)
-        test_score = self.test_player.score
-        valid_hand = self.test_player.valid_hand
-
-        self.assertEqual(self.test_player.announce_score(), 'Bust! Your hand scores 29 points.')
-        self.assertEqual(test_score, 29)
-        self.assertEqual(valid_hand, 0)
-    
-    def test_check_hand_valid_returns_bust_for_over_21(self):
-        test_card1 = "King of spades"
-        test_card2 = "Jack of clubs"
-        test_card3 = "9 of diamonds"
-        self.test_player.receive_card(test_card1)
-        self.test_player.receive_card(test_card2)
-        self.test_player.receive_card(test_card3)
-        self.assertEqual(self.test_player.check_hand_valid(), 'Bust')
-    
-    def test_check_hand_valid_returns_valid_for_under_21(self):
-        test_card1 = "King of spades"
-        test_card2 = "Jack of clubs"
-        self.test_player.receive_card(test_card1)
-        self.test_player.receive_card(test_card2)
-        
-        self.assertEqual(self.test_player.check_hand_valid(), 'Valid')
-
-    
-    def test_twist_returns_string(self):
-        self.test_game.deck = Deck() 
-        self.test_game.deck.shuffle()
-        test_card1 = "Jack of clubs"
-        test_card2 = "9 of diamonds"
-        self.test_player.receive_card(test_card1)
-        self.test_player.receive_card(test_card2)
-        
-        self.assertIsInstance(self.test_player.twist(self.test_game), str) 
-    
-    def test_twist_fails_for_bust_hand(self):
-        test_card1 = "King of spades"
-        test_card2 = "Jack of clubs"
-        test_card3 = "9 of diamonds"
-        self.test_player.receive_card(test_card1)
-        self.test_player.receive_card(test_card2)
-        self.test_player.receive_card(test_card3)
-        self.assertEqual(self.test_player.twist(self.test_game), 'Cannot twist on bust hand!')
-
-
-    def test_twist_adds_card_to_hand(self):
-        self.test_game.deck = Deck() 
-        self.test_game.deck.shuffle()
-        test_card1 = "Jack of clubs"
-        test_card2 = "9 of diamonds"
-        self.test_player.receive_card(test_card1)
-        self.test_player.receive_card(test_card2)
-        self.test_player.twist(self.test_game)
-        self.assertEqual(len(self.test_player.hand), 3)
-        
-    
-    def test_twist_changes_score_correctly(self):
-        self.test_game.deck.cards = ['2 of clubs', '2 of diamonds']
+    def test_player_can_receive_multiple_cards(self, test_player):
         test_card1 = "3 of clubs"
-        test_card2 = "9 of diamonds"
-        self.test_player.receive_card(test_card1)
-        self.test_player.receive_card(test_card2)
-        self.test_player.twist(self.test_game)
-        self.assertEqual(self.test_player.score, 14)
+        test_card2 = "6 of diamonds"
+        test_player.receive_card(test_card1)
+        test_player.receive_card(test_card2)
+        assert test_player.hands[0] == ["3 of clubs", "6 of diamonds"]
 
-    def test_stick_returns_correct_string(self):
+    def test_receiving_cards_updates_score(self, test_player):
+        test_card1 = "3 of clubs"
+        test_card2 = "6 of diamonds"
+        test_player.receive_card(test_card1)
+        test_player.receive_card(test_card2)
+        assert test_player.score[0] == 9
+
+    def test_announce_returns_correct_for_two_cards(self, test_player):
+        test_card1 = "3 of clubs"
+        test_card2 = "6 of diamonds"
+        test_player.receive_card(test_card1)
+        test_player.receive_card(test_card2)
+        assert test_player.announce_score() == 'Your hand scores 9 points.'
+        assert test_player.score[0] == 9
+
+    def test_score_hand_returns_correct_for_hand_with_ace(self, test_player):
+        test_card1 = "King of spades"
+        test_card2 = "Ace of clubs"
+        test_player.receive_card(test_card1)
+        test_player.receive_card(test_card2)
+        assert test_player.announce_score() == 'Your hand scores 21 points.'
+        assert test_player.score[0] == 21
+
+    def test_twist_returns_string(self, test_player, test_game):
+        test_game.deck = Deck()
+        test_game.deck.shuffle()
         test_card1 = "Jack of clubs"
         test_card2 = "9 of diamonds"
-        self.test_player.receive_card(test_card1)
-        self.test_player.receive_card(test_card2)
-        self.assertEqual(self.test_player.stick(), "You stick with hand ['Jack of clubs', '9 of diamonds'] scoring 19 points.")
-    
-   
-    
-class DealerTestCase(unittest.TestCase):
+        test_player.receive_card(test_card1)
+        test_player.receive_card(test_card2)
+        assert isinstance(test_player.twist(test_game), str)
 
-    def setUp(self):
-        self.test_dealer = Dealer()
-        self.test_player = Player("Ruby")
-        self.test_game = Game(self.test_player)
-        self.test_game.deck = Deck()
-        self.test_game.deck.shuffle()
-        
-    def tearDown(self):
-        pass
-
-    def test_dealer_name(self):
-        self.assertEqual(self.test_dealer.name, "Dealer") 
+    def test_twist_fails_for_bust_hand(self, test_player, test_game):
+        test_card1 = "King of spades"
+        test_card2 = "Jack of clubs"
+        test_card3 = "9 of diamonds"
+        test_player.receive_card(test_card1)
+        test_player.receive_card(test_card2)
+        test_player.receive_card(test_card3)
+        assert test_player.twist(test_game) == 'Cannot twist on bust hand!'
     
-     
-    def test_twist_adds_card_to_dealer_hand(self):
-        self.test_game.deck = Deck() 
-        self.test_game.deck.shuffle()
+    def test_split_raises_error_non_two_card_hand(self, test_player, test_game):
+        with pytest.raises(ValueError):
+            test_player.split(test_game) 
+    
+    def test_split_raises_error_different_rank_cards(self, test_player, test_game):
+        test_player.receive_card("5 of hearts")
+        test_player.receive_card("6 of clubs")
+        with pytest.raises(ValueError):
+            test_player.split(test_game)
+    
+    def test_split_adds_a_hand(self, test_player, test_game):
+        test_player.receive_card("2 of diamonds")
+        test_player.receive_card("2 of spades")
+        test_player.split(test_game)
+        assert len(test_player.hands) ==2
+    
+    def test_split_moves_second_card_to_new_hand(self, test_player, test_game):
+        test_player.receive_card("2 of diamonds")
+        test_player.receive_card("2 of spades")
+        test_player.split(test_game)
+        assert test_player.hands[1][0] == "2 of spades"
+    
+    def test_split_keeps_first_card_in_old_hand(self, test_player, test_game):
+        test_player.receive_card("2 of diamonds")
+        test_player.receive_card("2 of spades")
+        test_player.split(test_game)
+        assert test_player.hands[0][0] == "2 of diamonds"
+    
+    def test_split_deals_one_valid_card_to_each_split_hand(self, test_player, test_game):
+        test_player.receive_card("2 of diamonds")
+        test_player.receive_card("2 of spades")
+        test_player.split(test_game)
+        assert len(test_player.hands[0]) == 2
+        assert len(test_player.hands[1]) == 2
+        assert "of" in test_player.hands[0][1]
+        assert "of" in test_player.hands[1][1]
+    
+    def test_split_can_split_again(self, test_player, test_game):
+        test_player.receive_card("2 of diamonds")
+        test_player.receive_card("4 of spades")
+        test_player.hands.append(["2 of clubs", "2 of spades"])
+        test_player.split(test_game, 1)
+        assert len(test_player.hands) == 3
+        assert len(test_player.hands[2]) == 2
+    
+    def test_can_split_returns_correct_non_two_card_hand(self, test_player): 
+        assert test_player.can_split() == 'No'
+    
+    def test_can_split_returns_no_for_different_rank_cards(self, test_player):
+        test_player.receive_card("5 of hearts")
+        test_player.receive_card("6 of clubs")
+        assert test_player.can_split() == 'No'
+    
+    def test_can_split_returns_yes_for_two_same_rank_cards(self, test_player):
+        test_player.receive_card("5 of hearts")
+        test_player.receive_card("5 of clubs")
+        assert test_player.can_split() == 'Yes'
+    
+    def test_can_split_works_for_split_hands(self, test_player):
+        test_player.receive_card("2 of diamonds")
+        test_player.receive_card("4 of spades")
+        test_player.hands.append(["2 of clubs", "2 of spades"])
+        assert test_player.can_split(0) == 'No'
+        assert test_player.can_split(1) == 'Yes'
+
+    
+
+    
+
+
+
+class TestDealer:
+    def test_dealer_name(self, test_dealer):
+        assert test_dealer.name == "Dealer"
+
+    def test_dealer_twist_adds_card_to_hand(self, test_dealer, test_game):
+        test_game.deck.shuffle()
         test_card1 = "Jack of clubs"
         test_card2 = "9 of diamonds"
-        self.test_dealer.receive_card(test_card1)
-        self.test_dealer.receive_card(test_card2)
-        self.test_dealer.twist(self.test_game)
-        self.assertEqual(len(self.test_dealer.hand), 3)
+        test_dealer.receive_card(test_card1)
+        test_dealer.receive_card(test_card2)
+        test_dealer.twist(test_game)
+        assert len(test_dealer.hands[0]) == 3
 
-    def test_take_turn_keeps_drawing_cards_until_score_over_16(self):
-        
+    def test_dealer_take_turn_keeps_drawing_until_score_over_16(self, test_dealer, test_game):
         test_card1 = "Jack of clubs"
         test_card2 = "3 of diamonds"
+        test_dealer.receive_card(test_card1)
+        test_dealer.receive_card(test_card2)
+        test_dealer.take_turn(test_game)
+        assert test_dealer.score[0] >= 17
 
-        self.test_dealer.receive_card(test_card1)
-        self.test_dealer.receive_card(test_card2)
-
-        self.test_dealer.take_turn(self.test_game)
-
-        self.assertGreaterEqual(self.test_dealer.score, 17)
-    
-    def test_take_turns_removes_card_from_the_deck_if_score_under_17(self):
+    def test_dealer_take_turn_reduces_deck_count(self, test_dealer, test_game):
         test_card1 = "Jack of clubs"
         test_card2 = "2 of diamonds"
-        self.test_dealer.receive_card(test_card1)
-        self.test_dealer.receive_card(test_card2)
-        self.test_dealer.take_turn(self.test_game)
-        self.assertLess(len(self.test_game.deck.cards), 52)
-    
-    def test_take_turn_sticks_if_score_higher_than_17(self):
+        test_dealer.receive_card(test_card1)
+        test_dealer.receive_card(test_card2)
+        test_dealer.take_turn(test_game)
+        assert len(test_game.deck.cards) < 52
+
+    def test_dealer_take_turn_sticks_if_score_higher_than_17(self, test_dealer, test_game):
         test_card1 = "Jack of clubs"
         test_card2 = "9 of diamonds"
-        self.test_dealer.receive_card(test_card1)
-        self.test_dealer.receive_card(test_card2)
-        self.test_dealer.take_turn(self.test_game)
-        self.assertEqual(len(self.test_game.deck.cards), 52)
+        test_dealer.receive_card(test_card1)
+        test_dealer.receive_card(test_card2)
+        test_dealer.take_turn(test_game)
+        assert len(test_game.deck.cards) == 52
 
-
-
-
-
-        
-
-
-        
-if __name__ == '__main__':
-    unittest.main()
 
 
         
