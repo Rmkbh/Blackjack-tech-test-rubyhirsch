@@ -1,6 +1,6 @@
 #################################################################################
 #
-# Makefile for Blackjack Game Project
+# Makefile for Blackjack Game Project (Updated for pytest and requirements.txt)
 #
 #################################################################################
 
@@ -21,22 +21,11 @@ venv:
 activate:
 	@echo "Run: source venv/bin/activate"
 
-## Install dependencies (black, coverage, bandit)
+## Install dependencies from requirements.txt
 install-deps: venv
 	./venv/bin/$(PIP) install --upgrade pip
-	./venv/bin/$(PIP) install coverage bandit
-	@echo "Dependencies installed."
-
-## Install coverage
-coverage:
-	./venv/bin/$(PIP) install coverage
-
-## Install bandit
-bandit:
-	./venv/bin/$(PIP) install bandit
-
-## Set up dev requirements
-dev-setup: coverage bandit
+	./venv/bin/$(PIP) install -r requirements.txt
+	@echo "Dependencies installed from requirements.txt."
 
 # Build / Run
 
@@ -44,14 +33,13 @@ dev-setup: coverage bandit
 security-test:
 	source ./venv/bin/activate && bandit -lll src/*.py test/*.py
 
-## Run the unit tests using unittest (with venv activation)
+## Run the unit tests using pytest (with venv activation and warnings disabled)
 unit-test:
-	source ./venv/bin/activate && PYTHONPATH=${PYTHONPATH} python3 -m unittest discover -s test -p 'test_*.py' -v
+	source ./venv/bin/activate && PYTHONPATH=${PYTHONPATH} pytest -p no:warnings --tb=short
 
-## Run the coverage check (with venv activation)
+## Run the coverage check using pytest
 check-coverage:
-	source ./venv/bin/activate && PYTHONPATH=${PYTHONPATH} coverage run -m unittest discover -s test
-	source ./venv/bin/activate && PYTHONPATH=${PYTHONPATH} coverage report
+	source ./venv/bin/activate && PYTHONPATH=${PYTHONPATH} pytest --cov=src --cov-report=term-missing
 
 ## Run the Blackjack script (with venv activation)
 run-blackjack:
@@ -61,6 +49,6 @@ run-blackjack:
 run-checks: activate security-test unit-test check-coverage
 
 ## Set up venv and run all checks
-venv-run-checks: install-deps dev-setup run-checks
+venv-run-checks: install-deps run-checks
 
 .DEFAULT_GOAL := venv-run-checks

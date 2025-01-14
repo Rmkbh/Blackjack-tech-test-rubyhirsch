@@ -46,3 +46,11 @@ class TestDeck:
         assert len(test_deck.cards) == 51
         test_deck.draw_card()
         assert len(test_deck.cards) == 50
+
+    def test_draw_card_raises_error_no_cards(self, test_deck):
+        test_deck.cards = []
+        with pytest.raises(ValueError):
+            test_deck.draw_card()
+        
+        
+
