@@ -33,14 +33,34 @@ class Game:
     
     def announce_winner(self):
         highest_player_score = 0
-        highest_scoring_player = None
-        highest_scoring_player_hand = None
+        highest_scoring_players_hands = []
         for player in self.players:
             for i in range(len(player.score)):
                 if player.score[i] > highest_player_score and player.score[i]<22:
                     highest_player_score = player.score[i]
-                    highest_scoring_player = player
-                    highest_scoring_player_hand = player.hands[i]
+                    
+        for player in self.players:
+            for i in range(len(player.score)):
+                if player.score[i] == highest_player_score:
+                    highest_scoring_players_hands.append((player, player.hands[i]))
+                    
+        pontoons = []
+        five_card_tricks = []
+        neither = []
+
+        if highest_player_score == 21:
+            
+            for hand in highest_scoring_players_hands:
+                if len(hand[1]) ==2 and hand[0].name not in pontoons:
+                    pontoons.append(hand[0].name)
+            
+            for hand in highest_scoring_players_hands:
+                if len(hand[1]) ==5 and hand[0].name not in five_card_tricks:
+                    five_card_tricks.append(hand[0].name)
+            
+            for hand in highest_scoring_players_hands:
+                if len(hand[1]) !=5 and len(hand[1]) !=2 and hand[0].name not in neither:
+                    neither.append(hand[0].name)
 
         #Non-21-dealer-win-case                
         if self.dealer.score[0] <21 and self.dealer.score[0] >= highest_player_score:
@@ -48,22 +68,18 @@ class Game:
         
         #Non-21-dealer-lose-case
         elif (self.dealer.score[0]<21 and highest_player_score<21 and self.dealer.score[0]<highest_player_score) or (self.dealer.score[0]>21 and highest_player_score<21 and highest_player_score):
-            winners = [highest_scoring_player.name]
-            for player in self.players:
-                for i in range(len(player.score)):
-                    if player.name != highest_scoring_player.name:
-                        if player.score[i] == highest_player_score and (player.name not in winners):
-                            winners.append(player.name)
+            winners = highest_scoring_players_hands
+
             if len(winners) ==1:
-                return f"{highest_scoring_player.name} wins with {highest_player_score} points!"
+                return f"{highest_scoring_players_hands[0][0].name} wins with {highest_player_score} points!"
             else:
                 if len(winners) ==2:
-                    return f"{winners[0]} and {winners[1]} draw with {highest_player_score} points!"
+                    return f"{winners[0][0].name} and {winners[1][0].name} draw with {highest_player_score} points!"
                 else:
-                    name_string = f'{winners[0]}'
+                    name_string = f'{winners[0][0].name}'
                     for i in range(1, len(winners)-1):
-                        name_string += f', {winners[i]}'
-                    name_string += f' and {winners[-1]}'
+                        name_string += f', {winners[i][0].name}'
+                    name_string += f' and {winners[-1][0].name}'
                     return f'{name_string} draw with {highest_player_score} points!' 
             
         #21 points dealer cases 
@@ -75,109 +91,85 @@ class Game:
             else: 
                 return  "Dealer wins with 21 points."
         elif self.dealer.score[0] == 21 and self.dealer.score[0] == highest_player_score:
+            
             if len(self.dealer.hands[0]) == 2:
                 return f"Dealer wins with a pontoon worth {self.dealer.score[0]} points."
             
-            elif len(self.dealer.hands[0]) !=2 and len(highest_scoring_player.hands[0]) ==2:
+            elif len(self.dealer.hands[0]) !=2 and len(pontoons)>0:
                 
-                pontoons = [highest_scoring_player]
-                for player in self.players:
-                    for i in range(len(player.score)):
-                        if player != highest_scoring_player:
-                            if player.score[i] == highest_player_score and len(player.hands[0])==2 and (player not in pontoons):
-                                pontoons.append(player)
                 if len(pontoons) ==1:
-                    return f"{highest_scoring_player.name} wins with a pontoon worth 21 points!"
+                    return f"{pontoons[0]} wins with a pontoon worth 21 points!"
                 elif len(pontoons) ==2:
-                    return f"{pontoons[0].name} and {pontoons[1].name} draw with pontoons worth 21 points!"
+                    return f"{pontoons[0]} and {pontoons[1]} draw with pontoons worth 21 points!"
                 else:
-                    name_string = f'{pontoons[0].name}'
+                    name_string = f'{pontoons[0]}'
                     for i in range(1, len(pontoons)-1):
-                        name_string += f', {pontoons[i].name}'
-                    name_string += f' and {pontoons[-1].name}'
+                        name_string += f', {pontoons[i]}'
+                    name_string += f' and {pontoons[-1]}'
                     return f'{name_string} draw with pontoons worth 21 points!'
-            
-
+               
             elif len(self.dealer.hands[0]) == 5:
                 return f"Dealer wins with a five card trick worth 21 points."
             
-            elif len(self.dealer.hands[0]) !=5 and len(highest_scoring_player.hands[0]) == 5:
-                five_card_tricks = [highest_scoring_player]
-                for player in self.players:
-                    for i in range(len(player.score)):
-                        if player != highest_scoring_player:
-                            if player.score[i] == highest_player_score and len(player.hands[0])==5 and (player not in five_card_tricks):
-                                five_card_tricks.append(player)
+            elif len(self.dealer.hands[0]) !=5 and len(five_card_tricks)>0:
+                
 
                 if len(five_card_tricks) ==1:
-                    return f"{highest_scoring_player.name} wins with a five card trick worth {highest_player_score} points!"
+                    return f"{five_card_tricks[0]} wins with a five card trick worth 21 points!"
                 elif len(five_card_tricks) ==2:
-                    return f"{five_card_tricks[0].name} and {five_card_tricks[1].name} draw with five card tricks worth 21 points!"
+                    return f"{five_card_tricks[0]} and {five_card_tricks[1]} draw with five card tricks worth 21 points!"
                 else:
-                    name_string = f'{five_card_tricks[0].name}'
+                    name_string = f'{five_card_tricks[0]}'
                     for i in range(1, len(five_card_tricks)-1):
-                        name_string += f', {five_card_tricks[i].name}'
-                    name_string += f' and {five_card_tricks[-1].name}'
+                        name_string += f', {five_card_tricks[i]}'
+                    name_string += f' and {five_card_tricks[-1]}'
                     return f'{name_string} draw with five card tricks worth 21 points!'
             
         #21 points player cases
         elif (self.dealer.score[0] <21 or self.dealer.score[0]>21) and highest_player_score == 21:
-            winners = [highest_scoring_player]
-            for player in self.players:
-                for i in range(len(player.score)):
-                    if player != highest_scoring_player:
-                        if player.score[i] == highest_player_score and (player not in winners):
-                            winners.append(player)
-            if len(winners) == 1:
-                if len(highest_scoring_player.hands[0])==2:
-                    return f"{highest_scoring_player.name} wins with a pontoon worth 21 points!"
-                elif len(highest_scoring_player.hands[0]) == 5:
-                    return f"{highest_scoring_player.name} wins with a five card trick worth 21 points!"
+            if len(highest_scoring_players_hands) == 1:
+                if len(highest_scoring_players_hands[0][1])==2:
+                    return f"{highest_scoring_players_hands[0][0].name} wins with a pontoon worth 21 points!"
+                
+                elif len(highest_scoring_players_hands[0][1]) == 5:
+                    return f"{highest_scoring_players_hands[0][0].name} wins with a five card trick worth 21 points!"
                 else:
-                    return f"{highest_scoring_player.name} wins with 21 points!"
+                    return f"{highest_scoring_players_hands[0][0].name} wins with 21 points!"
             else:
-                pontoons = []
-                five_card_tricks = []
-                neither = []
-                for winner in winners:
-                    if len(winner.hands[0]) == 2:
-                        pontoons.append(winner)
-                    elif len(winner.hands[0]) == 5:
-                        five_card_tricks.append(winner)
-                    else:
-                        neither.append(winner)
                 if len(pontoons)>0:
                     if len(pontoons)==1:
-                        return f'{pontoons[0].name} wins with a pontoon worth 21 points!'
+                        return f'{pontoons[0]} wins with a pontoon worth 21 points!'
                     elif len(pontoons) == 2:
-                        return f'{pontoons[0].name} and {pontoons[1].name} draw with pontoons worth 21 points!'
+                        return f'{pontoons[0]} and {pontoons[1]} draw with pontoons worth 21 points!'
                     else:
-                        name_string = f'{pontoons[0].name}'
+                        name_string = f'{pontoons[0]}'
                         for i in range(1, len(pontoons)-1):
-                            name_string += f', {pontoons[i].name}'
-                        name_string += f' and {pontoons[-1].name}'
+                            name_string += f', {pontoons[i]}'
+                        name_string += f' and {pontoons[-1]}'
                         return f'{name_string} draw with pontoons worth 21 points!'
+                    
                 elif len(five_card_tricks)>0:
                     if len(five_card_tricks)==1:
-                        return f'{five_card_tricks[0].name} wins with a five card trick worth 21 points!'
+                        return f'{five_card_tricks[0]} wins with a five card trick worth 21 points!'
                     elif len(five_card_tricks) == 2:
-                        return f'{five_card_tricks[0].name} and {five_card_tricks[1].name} draw with five card tricks worth 21 points!'
+                        return f'{five_card_tricks[0]} and {five_card_tricks[1]} draw with five card tricks worth 21 points!'
                     else:
-                        name_string = f'{five_card_tricks[0].name}'
+                        name_string = f'{five_card_tricks[0]}'
                         for i in range(1, len(five_card_tricks)-1):
-                            name_string += f', {five_card_tricks[i].name}'
-                        name_string += f' and {five_card_tricks[-1].name}'
+                            name_string += f', {five_card_tricks[i]}'
+                        name_string += f' and {five_card_tricks[-1]}'
                         return f'{name_string} draw with five card tricks worth 21 points!'
+                    
                 elif len(neither) > 0:
                     if len(neither)==1:
-                        return f'{neither[0].name} wins with 21 points!'
+                        return f'{neither[0]} wins with 21 points!'
                     elif len(neither) == 2:
-                        return f'{neither[0].name} and {neither[1].name} draw with 21 points!'
+                        return f'{neither[0]} and {neither[1]} draw with 21 points!'
                     else:
-                        name_string = f'{neither[0].name}'
+                        name_string = f'{neither[0]}'
                         for i in range(1, len(neither)-1):
-                            name_string += f', {neither[i].name}'
-                        name_string += f' and {neither[-1].name}'
+                            name_string += f', {neither[i]}'
+                        name_string += f' and {neither[-1]}'
                         return f'{name_string} draw with 21 points!'
 
         else:
