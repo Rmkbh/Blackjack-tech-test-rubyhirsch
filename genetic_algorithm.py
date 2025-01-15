@@ -1,5 +1,5 @@
 import random
-from blackjack_stick import play
+from blackjack_gen_alg import play
 import matplotlib.pyplot as plt
 
 ''' This is a bit of an experiment added because I've been interested in trying to make a genetic algorithm, 
@@ -80,7 +80,6 @@ def genetic_algorithm():
             parent1, parent2 = random.sample(parents, 2)
             # Crossbreed them
             child = crossbreed(parent1, parent2)
-            # child = random.choice(parents)
             #Small chance to mutate the child
             child = mutate(child)
             #Add the child to the next generation
