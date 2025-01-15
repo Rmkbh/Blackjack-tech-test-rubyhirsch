@@ -1,8 +1,13 @@
 from src.script_utils import get_player_names, clear_console, initialise_game
 import time
+import pyfiglet 
+
+
 
 def play():
     
+    text = pyfiglet.figlet_format("BLACK JACK", font="starwars")
+    print(text)
     print('''Welcome to BlackJack!''')
     player_names_count = get_player_names()
     player_names = player_names_count[0]
@@ -71,7 +76,7 @@ def play():
         print(''' \n ''')
 
         print(game.announce_winner())
-        
+
         again = input("Another hand? Yes (y) or No (n)?:").lower()
         if again in ["yes", "y"]:
             pass
@@ -82,25 +87,6 @@ def play():
 
 
 
-             
-
-
-
-
-
-
-
-''' Things to improve: 1. need to refactor to account for draws. If there is a draw between a player and dealer the dealer wins (already coded), but if there is a draw between players it should be counted as a draw. DONE - now need to add in extra testing for draw cases. 
-                       2. account for pontoons, ie a face card and an ace should beat any other forms of 21, next best is five card trick, then other 21s.
-                       3. add in a split option. maybe work on chromosomal thing first..
-
-'''
-    
-
-   
-
-
-
-
+            
 if __name__ == '__main__':
     play()

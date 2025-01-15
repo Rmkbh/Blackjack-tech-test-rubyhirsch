@@ -83,6 +83,18 @@ class Participant:
             return self.announce_score(hand_index)
         else:
             raise ValueError("The deck has run out of cards!")
+        
+    def twist_alg(self, game, hand_index=0):
+        
+        if self.score[hand_index] > 21:
+            return 'Cannot twist on bust hand!'
+        if len(game.deck.cards)>0:
+            card = game.deal_card()
+            self.receive_card(card, hand_index)
+            self.evaluate_score(hand_index)
+            return self.announce_score(hand_index)
+        else:
+            raise ValueError("The deck has run out of cards!")
     
     def stick(self, hand_index=0):
         self.evaluate_score(hand_index)
@@ -90,6 +102,10 @@ class Participant:
             return f'The dealer sticks with hand {self.hands[hand_index]} scoring {self.score[hand_index]} points.'
         else:
             return f'You stick with hand {self.hands[hand_index]} scoring {self.score[hand_index]} points.'
+    
+    def stick_alg(self, hand_index=0):
+        self.evaluate_score(hand_index)
+
     
 
 class Player(Participant):
@@ -138,12 +154,19 @@ class Dealer(Participant):
     
        
     def take_turn(self, game):
-        
         while self.evaluate_score() < 17:
             print(self.twist(game))
         self.evaluate_score()
         if self.valid_hand:    
             print(self.stick())
+    
+    def take_turn_alg(self, game):
+        while self.evaluate_score() < 17:
+            self.twist_alg(game)
+        self.evaluate_score()
+        if self.valid_hand:    
+            self.stick_alg()
+
 
 
       
