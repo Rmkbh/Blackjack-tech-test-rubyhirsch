@@ -1,49 +1,24 @@
-from src.deck import Deck
-from src.player import Player, Dealer
-from src.game import Game
+from src.script_utils import get_player_names, clear_console, initialise_game
+import time
 
 def play():
-    player_names = []
-    player_count = 1
-    print('''Welcome to BlackJack!
-          ''')
-    #I want an input to come up for a player to enter their name. I want that player saved as a player num 1 and so on, after each player has entered it should ask, any more players? If so it should ask again and save them as 2 etc
     
+    print('''Welcome to BlackJack!''')
+    player_names_count = get_player_names()
+    player_names = player_names_count[0]
+    player_count = player_names_count[1]
+
     while True:
-        print(''' \n 
-              ''')
-        name = input(f'Player {player_count}, please enter your name:')
-        if name.strip() == '':  
-                print("Name cannot be empty. Please try again.")
-        else:
-            player_names.append(name)
-        print(''' \n
-              ''')
-        answer = input(f'Thanks {name}, are there any more players joining the game? Yes (y) or No (n):').lower()
-        if answer not in ['y', 'yes', 'n', 'no']:
-             print("Invalid input. Please try again.")
-             continue
-        if answer == 'y' or answer== 'yes':
-            player_count +=1
-        else:
-            break
-    
-    #Ok now I've got the players saved to players variable, I want to start a game. 
-    while True:
-        players = []
+        
         number_of_busts = 0
-        for name in player_names:
-            players.append(Player(name))
-        game = Game(*players)
-        game.shuffle()
-        game.deal_initial_cards()
-        print(''' \n \n''')
-        
-        
+
+        game = initialise_game(player_names)
+       
         for i in range(player_count):
             hand_index = 0
             player = game.players[i]
-            print('\n \n \n \n \n \n \n \n \n \n \n \n \n \n \n \n ')
+            time.sleep(2)
+            clear_console()
             input(f'Please pass the device to {player.name} and press "Enter":')
             print(''' \n \n \n''')
 
@@ -62,8 +37,7 @@ def play():
 
                         else:
                             break
-
-                    
+  
                     stick_twist_answer = input('Would you like to stick (s) or twist (t)?').lower()
                     if stick_twist_answer == 't' or stick_twist_answer == 'twist':
                         print(''' \n \n ''')
@@ -75,8 +49,6 @@ def play():
                         else:
                             continue
                             
-                            
-                    
                     elif stick_twist_answer not in ['s', 't', 'stick', 'twist']:
                         print('Invalid input. Please try again.')
                         continue
@@ -87,18 +59,19 @@ def play():
                         hand_index+=1
                         break
 
-                        
-                
-                    
-            
             input('Please press "Enter" to finish your turn:')
 
-        print('''\n \n \n \n \n \n \n \n \n \n \n \n \n ''')
+        time.sleep(2)
+        clear_console()
+
         print('The dealer will now take their turn...')
         print(f'The dealer\'s hand is {game.dealer.hands[0]} scoring {game.dealer.score[0]} points.')
         game.dealer.take_turn(game)
+
         print(''' \n ''')
+
         print(game.announce_winner())
+        
         again = input("Another hand? Yes (y) or No (n)?:").lower()
         if again in ["yes", "y"]:
             pass
