@@ -1,7 +1,7 @@
 from src.game import Game
 from src.player import Player
 
-#Simple automated version of the game where the player never splits, for genetic algorithm purposes
+#Simple automated version of the game with no user input - and the player never splits, for genetic algorithm purposes
 
 def initialise_game(player_names):
     players = []
@@ -24,19 +24,13 @@ def play(stick_score):
     while hand_index<len(player.hands):
         hand = player.hands[hand_index]
 
-        #for most simple version, chromosomes choose not to split. could adapt this..
+        #for most simple version, chromosomes do not to split. could adapt this..
         while True:
-            while player.can_split(hand_index) == 'Yes':
-                split_answer = 'n'
-                if split_answer in ['yes', 'y', 'split']:
-                    player.split(game, hand_index)
-                else:
-                    break
             if 'Ace' in player.hands[0]:
-                score = stick_score[0]+stick_score[1]
+                threshold = stick_score[0]+stick_score[1]
             else:
-                score = stick_score[0]
-            if player.score[0] >= score:
+                threshold = stick_score[0]
+            if player.score[0] >= threshold:
                 stick_twist_answer = 's'
             else: 
                 stick_twist_answer = 't'
@@ -63,5 +57,5 @@ def play(stick_score):
 
             
 if __name__ == '__main__':
-    stick_score = 17
+    stick_score = (16, 1)
     print(play(stick_score))

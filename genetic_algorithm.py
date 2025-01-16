@@ -3,10 +3,10 @@ from blackjack_gen_alg import play
 import matplotlib.pyplot as plt
 
 ''' This is a bit of an experiment added because I've been interested in trying to make a genetic algorithm, 
-had some extra time and thought I'd give it a go as an extension. As far 
-as I can tell it hasn't worked very well, it is modelling the best score to stick on as around 14 which seems
-too low. Either there is a problem in the rules of my initial game or (more likely) there's a problem with the
-genetic algorithm. It's also completely untested, I hope you will forgive me for that! '''
+had some extra time and thought I'd give it a go as an extension. As far as I can tell it hasn't worked very well, 
+it is modelling the best score to stick on as around 14 which seems too low. Either there is a problem in the rules
+of my initial game or (more likely) there's a problem with the genetic algorithm. It's also completely untested, I 
+hope you will forgive me for that! '''
 
 
 population_size = 200
@@ -14,9 +14,7 @@ generations = 200
 mutation_rate = 0.05
 
 mean_stick_scores = []
-
-#soft weight is a parameter that will make the stick score a bit higher if the hand has an ace, since an ace 
-#can be one or eleven but is counted by the game as eleven where possible. A score is said to be 'soft' if it
+#Soft weight is a parameter that will make the stick score a bit higher if the hand has an ace. A score is said to be 'soft' if it
 #contains an ace, and 'hard' if not.
 mean_soft_weights = []
 best_win_rates = []
@@ -30,7 +28,7 @@ def fitness(stick_score):
         if 'Player_1' in win_announcement:
             win_total += 1
         else:
-            win_total += 0
+            win_total += 0.5
 
     win_rate = win_total/50
     return win_rate
@@ -43,19 +41,17 @@ def selection(population):
     sorted_population = sorted(population, key=fitness, reverse=True)
     return sorted_population[:len(population)//3]
 
-# Crossbreed: The selection becomes the parents. They are crossbred by randomly taking one parameter from each parent.
+# Crossbreed takes two parents from the selection. We randomly select one of these parents to take each paramter (base score and soft weight) from.
 def crossbreed(parent1, parent2):
     base_score = random.choice([parent1[0], parent2[0]])
     soft_weight = random.choice([parent1[1], parent2[1]])
     return [base_score, soft_weight]
 
-# Mutation: Sometimes a childs parameters will be randomly mutated slightly 
-import random
-
+# Mutation: 5% chance a child's parameters will be randomly mutated slightly 
 def mutate(stick_score):
-    # Only a small percentage will be mutated
+   
     if random.random() < mutation_rate:
-        stick_score[0] += random.randint(-1, 1)
+        stick_score[0] += random.uniform(-1, 1)
         stick_score[1] += random.uniform(-0.1, 0.1) 
         
         stick_score[0] = min(20, max(1, stick_score[0]))
