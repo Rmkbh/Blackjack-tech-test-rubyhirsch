@@ -1,5 +1,5 @@
 import pytest
-from src.player import Participant, Player, Dealer
+from src.player import Player, Dealer
 from src.game import Game
 from src.deck import Deck
 
@@ -138,12 +138,6 @@ class TestPlayer:
         test_player.hands.append(["2 of clubs", "2 of spades"])
         assert test_player.can_split(0) == 'No'
         assert test_player.can_split(1) == 'Yes'
-
-    
-
-    
-
-
 
 class TestDealer:
     def test_dealer_name(self, test_dealer):

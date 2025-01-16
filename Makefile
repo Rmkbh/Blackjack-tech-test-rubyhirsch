@@ -1,6 +1,6 @@
 #################################################################################
 #
-# Makefile for Blackjack Game Project (Updated for pytest and requirements.txt)
+# Makefile for Blackjack Game Project 
 #
 #################################################################################
 

@@ -28,11 +28,3 @@ class Deck:
 
 
 
-
-    
-    #so, at the beginning of the hand we need a deck of 52 cards, done.
-    #then, two cards are dealt to each player and two to the dealer
-
-
-
-

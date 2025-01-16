@@ -3,7 +3,6 @@ import time
 import pyfiglet 
 
 
-
 def play():
     
     text = pyfiglet.figlet_format("BLACK JACK", font="starwars")
@@ -83,9 +82,6 @@ def play():
         else: 
             print("Thanks for playing Blackjack.")
             break
-
-
-
 
             
 if __name__ == '__main__':

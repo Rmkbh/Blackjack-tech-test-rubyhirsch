@@ -21,14 +21,17 @@ def play(stick_score):
     hand_index = 0
     player = game.players[0]
     
+    
     while hand_index<len(player.hands):
         hand = player.hands[hand_index]
 
         while True:
+            threshold = stick_score[0]
             if 'Ace' in player.hands[0]:
-                threshold = stick_score[0]+stick_score[1]
-            else:
-                threshold = stick_score[0]
+                threshold += stick_score[1]
+            if 'Ace' in game.dealer.hands[0][0]:
+                threshold+= stick_score[2]
+            
             if player.score[0] >= threshold:
                 stick_twist_answer = 's'
             else: 
@@ -50,11 +53,7 @@ def play(stick_score):
 
     return game.announce_winner()
 
-
-
-
-
-            
+        
 if __name__ == '__main__':
-    stick_score = (16, 1)
+    stick_score = (16, 1, 1)
     print(play(stick_score))

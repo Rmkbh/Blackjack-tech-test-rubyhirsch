@@ -1,12 +1,10 @@
 import pytest
 from src.deck import Deck
 
-
 @pytest.fixture
 def test_deck():
     return Deck()
 
-   
 class TestDeck:
 
     def test_number_of_cards(self, test_deck):

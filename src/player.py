@@ -20,8 +20,6 @@ class Participant:
             non_aces = [card for card in self.hands[hand_index] if ('Ace' not in card)]
             aces = [card for card in self.hands[hand_index] if ('Ace' in card)]
 
-            
-
             for card in non_aces:
                 
                 rank_suit = card.split(" of ")
@@ -67,7 +65,6 @@ class Participant:
         else:
             raise ValueError("Valid hand checker faulty!")
         
-    
     def twist(self, game, hand_index=0):
         
         if self.score[hand_index] > 21:
@@ -107,7 +104,6 @@ class Participant:
         self.evaluate_score(hand_index)
 
     
-
 class Player(Participant):
 
     def __init__(self, name):
@@ -122,8 +118,7 @@ class Player(Participant):
                 return 'No'
         else: 
             return 'No'
-        
-        
+         
     def split(self, game, hand_index=0):
         if len(self.hands[hand_index])==2:
             if self.hands[hand_index][0].split(" of ")[0] == self.hands[hand_index][1].split(" of ")[0]:
@@ -140,19 +135,13 @@ class Player(Participant):
                 raise ValueError("Splitting only allowed for two cards of the same rank.")
         else:   
             raise ValueError("Splitting only allowed with initial two cards.")
-        
-        
 
 
-        
-    
 class Dealer(Participant):
     def __init__(self):
         super().__init__()
         self.name = "Dealer"
              
-    
-       
     def take_turn(self, game):
         while self.evaluate_score() < 17:
             print(self.twist(game))
