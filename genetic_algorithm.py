@@ -38,8 +38,13 @@ def generate_population(size):
 
 # Selection should choose 200 new chromosomes from the best third of chromosomes based on fitness
 def selection(population):
-    sorted_population = sorted(population, key=fitness, reverse=True)
-    return sorted_population[:len(population)//3]
+    # sorted_population = sorted(population, key=fitness, reverse=True)
+    selection = []
+    for i in range(200):
+        best_of_ten_chromosomes = sorted(random.sample(population, 10), key=fitness, reverse=True)[0]
+        selection.append(best_of_ten_chromosomes)
+    return selection
+    # return sorted_population[:len(population)//3]
 
 # Crossbreed takes two parents from the selection. We randomly select one of these parents to take each paramter (base score and soft weight) from.
 def crossbreed(parent1, parent2):

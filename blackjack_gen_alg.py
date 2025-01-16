@@ -24,7 +24,6 @@ def play(stick_score):
     while hand_index<len(player.hands):
         hand = player.hands[hand_index]
 
-        #for most simple version, chromosomes do not to split. could adapt this..
         while True:
             if 'Ace' in player.hands[0]:
                 threshold = stick_score[0]+stick_score[1]

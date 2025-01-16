@@ -27,7 +27,7 @@ Genetic algorithms are a technique inspired by natural selection. They create a 
 To run this program, make sure you have the following installed:
 
 - **Python** (version 3.x)
-- **Make** (if your system uses Makefile execution)
+- **Make** 
 
 ### Installing
 
@@ -50,16 +50,21 @@ To run this program, make sure you have the following installed:
     ```
     make
     ```
+2. Then activate the virtual environment with the command:
 
-2. Once the Makefile has run, you can start the Blackjack game by executing:
+    ```
+    source venv/bin/activate
+    ```
+
+3. Once the Makefile has run and the virtual environment is activated, you can start the Blackjack game by executing:
 
     ```
     python blackjack.py
     ```
 
-3. Follow the on-screen instructions to play the game!
+4. Follow the on-screen instructions to play the game!
 
-4. To run the genetic algorithm, and see a graph of the results, you can execute:
+5. To run the genetic algorithm, and see a graph of the results, you can execute:
 
    ```
    python genetic_algorithm.py
